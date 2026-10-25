@@ -13,8 +13,27 @@ Il tourne sur le PC encodeur (Linux) et s'utilise depuis n'importe quel navigate
 
 ---
 
+## Aperçu
+
+> Captures générées en mode DEV (données simulées) avec `scripts/screenshots.py`.
+
+### Dashboard
+
+![Dashboard : VU-mètre, état du direct, diffusion et titre en cours](docs/screenshots/dashboard.png)
+
+### Enregistrement
+
+![Page d'enregistrement : forme d'onde, commandes et choix du fichier](docs/screenshots/enregistrement.png)
+
+### Explorateur de dossiers
+
+![Explorateur de dossiers côté serveur](docs/screenshots/explorateur.png)
+
+---
+
 ## Sommaire
 
+- [Aperçu](#aperçu)
 - [Architecture](#architecture)
 - [Prérequis](#prérequis)
 - [Installation](#installation)
@@ -258,6 +277,17 @@ ruff check .        # lint
 pytest              # tests
 ```
 
+### Captures d'écran
+
+Les captures du README sont générées automatiquement, en mode DEV et avec un dossier personnel fictif :
+
+```bash
+playwright install chromium         # une seule fois
+python scripts/screenshots.py       # écrit docs/screenshots/*.png
+```
+
+Toute PR qui ajoute ou modifie une fonctionnalité ou l'interface doit régénérer ces captures et mettre à jour le README.
+
 La CI GitHub Actions (`.github/workflows/ci.yml`) s'exécute sur chaque PR et chaque push sur `main` :
 
 | Job | Contenu |
@@ -275,5 +305,6 @@ Les règles complètes sont dans [`AGENTS.md`](AGENTS.md). En résumé :
 - **Une branche par évolution** : `feature/etape-N-sujet`, `feature/sujet`, `fix/sujet` ou `docs/sujet`.
 - **Commits** au format [Conventional Commits](https://www.conventionalcommits.org/fr/), par exemple `feat(player): …`.
 - **CI au vert** avant fusion, et toute nouvelle logique arrive avec ses tests.
+- **README et captures d'écran à jour** dès qu'une fonctionnalité ou l'interface change.
 - **Aucun secret** dans le dépôt : variables d'environnement ou GitHub Actions Secrets.
 - **Fusion des PR** par le mainteneur uniquement.

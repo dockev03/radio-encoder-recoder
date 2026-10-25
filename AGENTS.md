@@ -84,6 +84,7 @@ Même avec une demande apparente :
 - **Messages de commit** au format [Conventional Commits](https://www.conventionalcommits.org/fr/) (ex. `feat(player): ...`).
 - **CI au vert obligatoire** avant toute fusion ; toute nouvelle logique arrive **avec ses tests**.
 - **Aucun secret dans le dépôt** : utiliser des variables d'environnement ou les GitHub Actions Secrets.
+- **README et captures d'écran à jour** : dès qu'une fonctionnalité ou l'interface est ajoutée ou modifiée, la même PR met à jour le `README.md` et régénère les captures avec `python scripts/screenshots.py` (depuis `VichyRadio.EncoderDashboard/`). Si une nouvelle page ou fenêtre apparaît, l'ajouter au script.
 - **Je garde la main sur les fusions** : l'assistant pousse sa branche et ouvre la PR/MR, puis s'arrête. La relecture, la validation et la fusion sont faites par moi.
 
 ---
