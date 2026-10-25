@@ -2286,7 +2286,15 @@ async function pauseManualRecording() {
                 "/api/recording/pause",
                 {
                     method:
-                        "POST"
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        "{}"
                 }
             );
 
@@ -2335,7 +2343,15 @@ async function resumeManualRecording() {
                 "/api/recording/resume",
                 {
                     method:
-                        "POST"
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        "{}"
                 }
             );
 
@@ -2398,7 +2414,15 @@ async function stopManualRecording() {
                 "/api/recording/stop",
                 {
                     method:
-                        "POST"
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        "{}"
                 }
             );
 
