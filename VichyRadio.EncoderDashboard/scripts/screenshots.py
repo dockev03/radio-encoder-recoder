@@ -31,6 +31,8 @@ FAKE_HOME = Path(tempfile.gettempdir()) / "vichy-screenshots" / "vichyradio"
 
 
 def _prepare_environment():
+    real_home = os.environ.get("HOME")
+
     shutil.rmtree(FAKE_HOME, ignore_errors=True)
 
     for name in ("emissions", "podcasts", "recordings/manual"):
@@ -41,6 +43,8 @@ def _prepare_environment():
     os.environ.pop("VICHY_DASHBOARD_ALLOWED_ROOTS", None)
 
     sys.path.insert(0, str(PROJECT_DIRECTORY))
+
+    return real_home
 
 
 def _start_server():
@@ -66,11 +70,17 @@ def _capture(page, name, full_page=True):
 
 
 def main():
-    _prepare_environment()
+    real_home = _prepare_environment()
 
     from playwright.sync_api import sync_playwright
 
     server, base_url = _start_server()
+
+    # L'application a lu le dossier fictif à l'import : on restaure le
+    # vrai HOME pour que Playwright retrouve ses navigateurs (~/.cache).
+    if real_home is not None:
+        os.environ["HOME"] = real_home
+
     OUTPUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
 
     try:
