@@ -76,6 +76,16 @@ Même avec une demande apparente :
 
 ---
 
+## 🌿 Workflow Git & qualité
+
+- **Jamais de commit direct** sur `main`, `master` ou `staging`.
+- **Une branche par évolution** : `feature/etape-N-sujet`, `feature/sujet`, `fix/sujet` ou `docs/sujet`.
+- **Messages de commit** au format [Conventional Commits](https://www.conventionalcommits.org/fr/) (ex. `feat(player): ...`).
+- **CI au vert obligatoire** avant toute fusion ; toute nouvelle logique arrive **avec ses tests**.
+- **Aucun secret dans le dépôt** : utiliser des variables d'environnement ou les GitHub Actions Secrets.
+
+---
+
 ## 🔁 Après validation
 
 Une fois la modification appliquée :
