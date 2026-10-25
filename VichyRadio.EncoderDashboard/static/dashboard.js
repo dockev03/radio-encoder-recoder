@@ -1544,9 +1544,9 @@ const recordingElements = {
             "recording-duration"
         ),
 
-    segments:
+    dropouts:
         document.getElementById(
-            "recording-segments"
+            "recording-dropouts"
         ),
 
     size:
@@ -1745,7 +1745,8 @@ function getRecordingFilenameFromPath(
    ============================================================ */
 
 function setRecordingVisualState(
-    status
+    status,
+    reconnecting = false
 ) {
 
     const state =
@@ -1776,13 +1777,22 @@ function setRecordingVisualState(
 
         case "recording":
 
+            /*
+             * Source perdue : le backend relance
+             * la capture jusqu'à son retour.
+             */
+
             state.classList.add(
-                "recording"
+                reconnecting
+                    ? "paused"
+                    : "recording"
             );
 
 
             text.textContent =
-                "ENREGISTREMENT";
+                reconnecting
+                    ? "SOURCE PERDUE"
+                    : "ENREGISTREMENT";
 
             break;
 
@@ -1938,7 +1948,10 @@ function renderRecordingStatus(
 
 
     setRecordingVisualState(
-        status
+        status,
+        Boolean(
+            data.reconnecting
+        )
     );
 
 
@@ -1987,12 +2000,12 @@ function renderRecordingStatus(
 
 
     /*
-     * Nombre de segments.
+     * Coupures de la source pendant la session.
      */
 
-    recordingElements.segments.textContent =
+    recordingElements.dropouts.textContent =
         Number(
-            data.segment_count
+            data.dropouts
         ) || 0;
 
 
