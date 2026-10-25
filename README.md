@@ -286,6 +286,8 @@ playwright install chromium         # une seule fois
 python scripts/screenshots.py       # écrit docs/screenshots/*.png
 ```
 
+Le script fonctionne sous Linux, macOS et Windows.
+
 Toute PR qui ajoute ou modifie une fonctionnalité ou l'interface doit régénérer ces captures et mettre à jour le README.
 
 La CI GitHub Actions (`.github/workflows/ci.yml`) s'exécute sur chaque PR et chaque push sur `main` :
