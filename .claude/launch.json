@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dashboard",
+      "runtimeExecutable": "VichyRadio.EncoderDashboard/.venv/Scripts/python.exe",
+      "runtimeArgs": ["VichyRadio.EncoderDashboard/app.py"],
+      "port": 8080
+    }
+  ]
+}

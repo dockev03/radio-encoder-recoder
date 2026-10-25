@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Vichy Radio - Encodeur Live</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <header class="header">
+
+        <div>
+            <h1>VICHY RADIO</h1>
+            <div class="subtitle">
+                ENCODEUR LIVE
+            </div>
+        </div>
+
+        <div
+            id="global-status"
+            class="global-status"
+        >
+            <span
+                id="global-status-dot"
+                class="dot red"
+            ></span>
+
+            <span id="global-status-text">
+                INITIALISATION
+            </span>
+        </div>
+
+        <div
+            id="clock"
+            class="clock"
+        >
+            --:--:--
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         NAVIGATION
+         ========================================================= -->
+
+    <nav class="main-navigation">
+
+        <button
+            type="button"
+            class="nav-button active"
+            data-page="dashboard-page"
+        >
+            DASHBOARD
+        </button>
+
+        <button
+            type="button"
+            class="nav-button"
+            data-page="recording-page"
+        >
+            ENREGISTREMENT
+        </button>
+
+        <button
+            type="button"
+            class="nav-button"
+            data-page="settings-page"
+        >
+            PARAMÈTRES
+        </button>
+
+    </nav>
+
+
+    <!-- =========================================================
+         PAGE DASHBOARD
+         ========================================================= -->
+
+    <div
+        id="dashboard-page"
+        class="page active"
+    >
+
+        <!-- VU -->
+
+        <section class="card vu-card">
+
+            <div class="card-title">
+                NIVEAU AUDIO
+            </div>
+
+            <div class="vu-row">
+
+                <div class="vu-channel">
+                    L
+                </div>
+
+                <div class="meter-container">
+
+                    <div class="meter-scale">
+                        <span>-60</span>
+                        <span>-48</span>
+                        <span>-36</span>
+                        <span>-24</span>
+                        <span>-18</span>
+                        <span>-12</span>
+                        <span>-6</span>
+                        <span>0</span>
+                    </div>
+
+                    <div class="meter-track">
+
+                        <div
+                            id="meter-left"
+                            class="meter-fill"
+                        ></div>
+
+                        <div
+                            id="peak-left"
+                            class="meter-peak"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+                <div
+                    id="left-db"
+                    class="vu-value"
+                >
+                    -60.0 dB
+                </div>
+
+            </div>
+
+
+            <div class="vu-row">
+
+                <div class="vu-channel">
+                    R
+                </div>
+
+                <div class="meter-container">
+
+                    <div class="meter-scale">
+                        <span>-60</span>
+                        <span>-48</span>
+                        <span>-36</span>
+                        <span>-24</span>
+                        <span>-18</span>
+                        <span>-12</span>
+                        <span>-6</span>
+                        <span>0</span>
+                    </div>
+
+                    <div class="meter-track">
+
+                        <div
+                            id="meter-right"
+                            class="meter-fill"
+                        ></div>
+
+                        <div
+                            id="peak-right"
+                            class="meter-peak"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+                <div
+                    id="right-db"
+                    class="vu-value"
+                >
+                    -60.0 dB
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- CARDS PRINCIPALES -->
+
+        <main class="main-grid">
+
+            <!-- DIRECT STUDIO -->
+
+            <section class="card">
+
+                <div class="card-title">
+                    DIRECT STUDIO
+                </div>
+
+
+                <div class="status-line">
+
+                    <span>
+                        <i
+                            id="aureon-dot"
+                            class="dot red"
+                        ></i>
+
+                        AUREON
+                    </span>
+
+                    <strong id="aureon-status">
+                        INITIALISATION
+                    </strong>
+
+                </div>
+
+
+                <div class="status-line">
+
+                    <span>
+                        <i
+                            id="easyeffects-dot"
+                            class="dot red"
+                        ></i>
+
+                        EASYEFFECTS
+                    </span>
+
+                    <strong id="easyeffects">
+                        INITIALISATION
+                    </strong>
+
+                </div>
+
+
+                <div class="status-line">
+
+                    <span>
+                        <i
+                            id="source-dot"
+                            class="dot red"
+                        ></i>
+
+                        SOURCE AUDIO
+                    </span>
+
+                    <strong id="source-status">
+                        INITIALISATION
+                    </strong>
+
+                </div>
+
+
+                <div class="status-line">
+
+                    <span>
+                        <i
+                            id="signal-dot"
+                            class="dot yellow"
+                        ></i>
+
+                        SIGNAL
+                    </span>
+
+                    <strong
+                        id="signal-status"
+                        class="yellow-text"
+                    >
+                        INITIALISATION
+                    </strong>
+
+                </div>
+
+
+                <!-- WATCHDOG -->
+
+                <div class="watchdog-block">
+
+                    <div
+                        class="
+                            status-line
+                            watchdog-status-line
+                        "
+                    >
+
+                        <span>
+
+                            <i
+                                id="watchdog-dot"
+                                class="dot red"
+                            ></i>
+
+                            WATCHDOG
+
+                        </span>
+
+                        <strong id="watchdog-status">
+                            INITIALISATION
+                        </strong>
+
+                    </div>
+
+
+                    <div class="watchdog-details">
+
+                        <span id="watchdog-recoveries">
+                            0 RÉCUPÉRATION
+                        </span>
+
+                        <span id="watchdog-last-incident">
+                            AUCUN INCIDENT
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="status-line">
+
+                    <span>
+
+                        <i
+                            id="butt-dot"
+                            class="dot red"
+                        ></i>
+
+                        BUTT
+
+                    </span>
+
+                    <strong id="butt">
+                        INITIALISATION
+                    </strong>
+
+                </div>
+
+            </section>
+
+
+            <!-- DIFFUSION -->
+
+            <section class="card">
+
+                <div class="card-title">
+                    DIFFUSION
+                </div>
+
+
+                <div
+                    id="on-air"
+                    class="on-air offline"
+                >
+
+                    <span class="on-air-dot"></span>
+
+                    <span id="on-air-text">
+                        OFF AIR
+                    </span>
+
+                </div>
+
+
+                <div class="stream-info">
+
+                    <div>
+
+                        <span>
+                            SERVEUR
+                        </span>
+
+                        <strong id="server">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            CONNEXION
+                        </span>
+
+                        <strong id="connection-status">
+                            NON CONNECTÉ
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            CODEC
+                        </span>
+
+                        <strong id="codec">
+                            NON CONNECTÉ
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="stream-status"
+                    class="stream-status"
+                >
+
+                    <span class="dot red"></span>
+
+                    HORS ANTENNE
+
+                </div>
+
+            </section>
+
+
+            <!-- NOW PLAYING -->
+
+            <section class="card now-playing-card">
+
+                <div class="card-title">
+                    EN COURS
+                </div>
+
+                <div class="now-playing">
+
+                    <div
+                        id="artist"
+                        class="artist"
+                    >
+                        Aucun titre
+                    </div>
+
+                    <div
+                        id="title"
+                        class="track-title"
+                    >
+                        Hors antenne
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- =========================================================
+         PAGE ENREGISTREMENT
+         ========================================================= -->
+
+    <div
+        id="recording-page"
+        class="page"
+    >
+
+        <!-- ETAT -->
+
+        <section class="card recording-header-card">
+
+            <div class="recording-status-header">
+
+                <div>
+
+                    <div class="card-title">
+                        ENREGISTREMENT
+                    </div>
+
+                    <div class="recording-source">
+
+                        SOURCE
+
+                        <strong>
+                            easyeffects_source
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="manual-recording-status"
+                    class="recording-state stopped"
+                >
+
+                    <span
+                        id="manual-recording-dot"
+                        class="recording-state-dot"
+                    ></span>
+
+                    <span id="manual-recording-state-text">
+                        PRÊT
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- WAVEFORM -->
+
+        <section class="card waveform-card">
+
+            <div class="card-title">
+                SIGNAL AUDIO
+            </div>
+
+            <div class="waveform-container">
+
+                <canvas
+                    id="recording-waveform"
+                    class="recording-waveform"
+                ></canvas>
+
+                <div class="waveform-center-line"></div>
+
+            </div>
+
+
+            <div
+                id="recording-timer"
+                class="recording-timer"
+            >
+                00:00:00
+            </div>
+
+        </section>
+
+
+        <!-- COMMANDES -->
+
+        <section class="card recording-controls-card">
+
+            <div class="recording-controls">
+
+                <button
+                    type="button"
+                    id="record-start"
+                    class="
+                        recording-button
+                        recording-button-start
+                    "
+                >
+                    <span class="record-icon"></span>
+
+                    START
+                </button>
+
+
+                <button
+                    type="button"
+                    id="record-pause"
+                    class="
+                        recording-button
+                        recording-button-secondary
+                    "
+                    disabled
+                >
+                    ❚❚ PAUSE
+                </button>
+
+
+                <button
+                    type="button"
+                    id="record-resume"
+                    class="
+                        recording-button
+                        recording-button-secondary
+                    "
+                    disabled
+                >
+                    ▶ REPRENDRE
+                </button>
+
+
+                <button
+                    type="button"
+                    id="record-stop"
+                    class="
+                        recording-button
+                        recording-button-stop
+                    "
+                    disabled
+                >
+                    ■ STOP
+                </button>
+
+            </div>
+
+
+            <div
+                id="recording-error-message"
+                class="recording-error-message"
+                hidden
+            >
+
+                <strong>
+                    ENREGISTREMENT INTERROMPU
+                </strong>
+
+                <span>
+                    La source audio ou le processus
+                    d'enregistrement a été perdu.
+                    Les données déjà enregistrées sont conservées.
+                    Appuyez sur STOP pour tenter de finaliser
+                    le fichier.
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- CONFIGURATION FICHIER -->
+
+        <section class="card recording-file-card">
+
+            <div class="card-title">
+                FICHIER
+            </div>
+
+
+            <div class="recording-form-grid">
+
+                <div class="recording-field recording-field-name">
+
+                    <label for="recording-filename">
+                        NOM DU FICHIER
+                    </label>
+
+                    <input
+                        type="text"
+                        id="recording-filename"
+                        value=""
+                        placeholder="Nom de l'enregistrement"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <div class="recording-field">
+
+                    <label for="recording-format">
+                        FORMAT
+                    </label>
+
+                    <select id="recording-format">
+
+                        <option value="wav">
+                            WAV 24 bits
+                        </option>
+
+                        <option value="flac">
+                            FLAC
+                        </option>
+
+                        <option value="mp3">
+                            MP3 320 kb/s
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="recording-field recording-field-path">
+
+                    <label for="recording-directory">
+                        CHEMIN
+                    </label>
+
+                    <div class="recording-path-row">
+
+                        <input
+                            type="text"
+                            id="recording-directory"
+                            value="/home/vichyradio/recordings/manual"
+                            autocomplete="off"
+                        >
+
+                        <button
+                            type="button"
+                            id="recording-directory-browse"
+                            class="recording-browse-button"
+                        >
+                            PARCOURIR…
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- INFORMATIONS -->
+
+        <section class="recording-info-grid">
+
+            <div class="card recording-info-card">
+
+                <span>
+                    DURÉE
+                </span>
+
+                <strong id="recording-duration">
+                    00:00:00
+                </strong>
+
+            </div>
+
+
+            <div class="card recording-info-card">
+
+                <span>
+                    SEGMENTS
+                </span>
+
+                <strong id="recording-segments">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="card recording-info-card">
+
+                <span>
+                    TAILLE
+                </span>
+
+                <strong id="recording-size">
+                    0 Mo
+                </strong>
+
+            </div>
+
+            <div class="card recording-info-card">
+
+                <span>
+                    ESPACE LIBRE
+                </span>
+
+                <strong id="recording-disk-free">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div class="card recording-info-card">
+
+                <span>
+                    FICHIER
+                </span>
+
+                <strong id="recording-current-file">
+                    Aucun
+                </strong>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- =========================================================
+         PAGE PARAMETRES
+         ========================================================= -->
+
+    <div
+        id="settings-page"
+        class="page"
+    >
+
+        <section class="card">
+
+            <div class="card-title">
+                PARAMÈTRES
+            </div>
+
+            <div class="settings-placeholder">
+
+                Les paramètres de l'encodeur
+                seront disponibles ici.
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- =========================================================
+         BARRE SYSTEME
+         ========================================================= -->
+
+    <section class="system-bar">
+
+        <div>
+
+            <span>
+                CPU
+            </span>
+
+            <strong id="cpu">
+                --
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                RAM
+            </span>
+
+            <strong id="ram">
+                --
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                TEMP
+            </span>
+
+            <strong id="temperature">
+                --
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                UPTIME
+            </span>
+
+            <strong id="uptime">
+                --
+            </strong>
+
+        </div>
+
+
+        <div class="network-system">
+
+            <span>
+                RÉSEAU
+            </span>
+
+            <strong id="network-status">
+                INITIALISATION
+            </strong>
+
+            <small
+                id="network-details"
+                class="system-detail"
+            >
+                --
+            </small>
+
+            <small
+                id="network-speed"
+                class="network-speed"
+            >
+
+                <span class="download">
+                    ↓ --
+                </span>
+
+                <span class="upload">
+                    ↑ --
+                </span>
+
+            </small>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<!-- =============================================================
+     MODALE COLLISION FICHIER
+     ============================================================= -->
+
+<div
+    id="file-collision-modal"
+    class="modal-overlay"
+    hidden
+>
+
+    <div class="modal-card">
+
+        <div class="modal-title">
+            LE FICHIER EXISTE DÉJÀ
+        </div>
+
+        <div class="modal-message">
+
+            Un fichier portant ce nom existe déjà :
+
+            <strong id="collision-file">
+                --
+            </strong>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+            <button
+                type="button"
+                id="collision-overwrite"
+                class="modal-button danger"
+            >
+                ÉCRASER
+            </button>
+
+
+            <button
+                type="button"
+                id="collision-copy"
+                class="modal-button primary"
+            >
+                CRÉER UNE COPIE
+            </button>
+
+
+            <button
+                type="button"
+                id="collision-cancel"
+                class="modal-button"
+            >
+                ANNULER
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =============================================================
+     MODALE CHOIX DU DOSSIER
+     ============================================================= -->
+
+<div
+    id="directory-picker-modal"
+    class="modal-overlay"
+    hidden
+>
+
+    <div class="modal-card directory-picker-card">
+
+        <div class="modal-title">
+            CHOISIR LE DOSSIER D'ENREGISTREMENT
+        </div>
+
+
+        <div
+            id="directory-picker-shortcuts"
+            class="directory-picker-shortcuts"
+        ></div>
+
+
+        <div class="directory-picker-toolbar">
+
+            <button
+                type="button"
+                id="directory-picker-up"
+                class="modal-button"
+                title="Dossier parent"
+            >
+                ↑ REMONTER
+            </button>
+
+            <div
+                id="directory-picker-path"
+                class="directory-picker-path"
+            >
+                --
+            </div>
+
+        </div>
+
+
+        <ul
+            id="directory-picker-list"
+            class="directory-picker-list"
+        ></ul>
+
+
+        <div
+            id="directory-picker-error"
+            class="directory-picker-error"
+            hidden
+        ></div>
+
+
+        <div class="modal-actions">
+
+            <button
+                type="button"
+                id="directory-picker-new"
+                class="modal-button directory-picker-new"
+            >
+                + NOUVEAU DOSSIER
+            </button>
+
+
+            <button
+                type="button"
+                id="directory-picker-cancel"
+                class="modal-button"
+            >
+                ANNULER
+            </button>
+
+
+            <button
+                type="button"
+                id="directory-picker-select"
+                class="modal-button primary"
+            >
+                CHOISIR CE DOSSIER
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="/static/dashboard.js"></script>
+
+</body>
+</html>
