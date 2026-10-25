@@ -21,6 +21,32 @@ SHORTCUT_CANDIDATES = [
     ("Disques montés", "/mnt"),
 ]
 
+# Dossiers en dehors desquels on ne liste, ne crée ni n'enregistre rien.
+# Surchargeable via VICHY_DASHBOARD_ALLOWED_ROOTS (séparateur : os.pathsep).
+ALLOWED_ROOTS = [
+    Path(os.path.expanduser(root)).resolve()
+    for root in (
+        os.getenv("VICHY_DASHBOARD_ALLOWED_ROOTS")
+        or os.pathsep.join([HOME_DIRECTORY, "/media", "/mnt"])
+    ).split(os.pathsep)
+    if root
+]
+
+
+def is_allowed_path(path):
+    path = Path(os.path.expanduser(str(path))).resolve()
+
+    for root in ALLOWED_ROOTS:
+        if path == root or root in path.parents:
+
+            # Pas de dossiers cachés (.ssh, .config…) sous une racine
+            return not any(
+                part.startswith(".")
+                for part in path.relative_to(root).parts
+            )
+
+    return False
+
 
 def _resolve(path):
     path = (path or "").strip()
@@ -37,7 +63,7 @@ def _get_shortcuts():
     shortcuts = []
 
     for label, path in SHORTCUT_CANDIDATES:
-        if os.path.isdir(path):
+        if os.path.isdir(path) and is_allowed_path(path):
             shortcuts.append({
                 "label": label,
                 "path": path
@@ -49,7 +75,7 @@ def _get_shortcuts():
     if os.path.isdir(user_media):
         try:
             for entry in sorted(os.scandir(user_media), key=lambda e: e.name.lower()):
-                if entry.is_dir():
+                if entry.is_dir() and is_allowed_path(entry.path):
                     shortcuts.append({
                         "label": entry.name,
                         "path": entry.path
@@ -63,9 +89,16 @@ def _get_shortcuts():
 def list_directories(path=None):
     directory = _resolve(path)
 
+    if not is_allowed_path(directory):
+        return {
+            "success": False,
+            "error": "permission_denied",
+            "path": str(directory)
+        }
+
     # Si le chemin saisi n'existe pas encore, on remonte jusqu'au
     # premier parent existant pour que l'utilisateur puisse naviguer.
-    while not directory.is_dir() and directory != directory.parent:
+    while not directory.is_dir() and is_allowed_path(directory.parent):
         directory = directory.parent
 
     try:
@@ -95,7 +128,7 @@ def list_directories(path=None):
     return {
         "success": True,
         "path": str(directory),
-        "parent": str(parent) if parent != directory else None,
+        "parent": str(parent) if is_allowed_path(parent) else None,
         "writable": os.access(directory, os.W_OK),
         "directories": [
             {
@@ -123,6 +156,12 @@ def create_directory(parent, name):
         }
 
     target = _resolve(parent) / name
+
+    if not is_allowed_path(target):
+        return {
+            "success": False,
+            "error": "permission_denied"
+        }
 
     if target.exists():
         return {

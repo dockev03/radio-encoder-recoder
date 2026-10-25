@@ -175,6 +175,9 @@ def recording_start():
     if error == "recording_already_running":
         return jsonify(result), 409
 
+    if error == "permission_denied":
+        return jsonify(result), 403
+
     return jsonify(result), 500
 
 

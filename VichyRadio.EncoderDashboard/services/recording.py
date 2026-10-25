@@ -8,6 +8,8 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+from services.filesystem import is_allowed_path
+
 
 SOURCE_NAME = "easyeffects_source"
 SAMPLE_RATE = 48000
@@ -468,6 +470,13 @@ def start_recording(
 
         if directory is None:
             directory = DEFAULT_DIRECTORY
+
+        if not is_allowed_path(directory):
+            return {
+                "success": False,
+                "error": "permission_denied",
+                "directory": directory
+            }
 
         if filename is None:
             filename = datetime.now().strftime(
