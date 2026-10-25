@@ -85,11 +85,6 @@ def main():
             _capture(page, "dashboard")
 
             page.click('[data-page="recording-page"]')
-            page.fill(
-                "#recording-directory",
-                str(FAKE_HOME / "recordings" / "manual")
-            )
-            page.locator("#recording-directory").blur()
             _capture(page, "enregistrement")
 
             page.click("#recording-directory-browse")
