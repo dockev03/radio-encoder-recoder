@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request
 
-from config import MODE
+from config import MODE, HOST, PORT, DEBUG
 
 from services.audio import get_audio_status
 from services.audio_meter import (
@@ -294,10 +294,22 @@ def filesystem_create_directory():
 # Application
 # ---------------------------------------------------------------------------
 
+LOOPBACK_HOSTS = ("127.0.0.1", "localhost", "::1")
+
+
+def resolve_bind_host(host, debug):
+
+    # Debugger actif : on n'écoute qu'en local, quel que soit HOST
+    if debug and host not in LOOPBACK_HOSTS:
+        return "127.0.0.1"
+
+    return host
+
+
 if __name__ == "__main__":
 
     app.run(
-        host="0.0.0.0",
-        port=8080,
-        debug=(MODE == "DEV")
+        host=resolve_bind_host(HOST, DEBUG),
+        port=PORT,
+        debug=DEBUG
     )
