@@ -29,22 +29,39 @@ SETTLE_MS = 2500
 # Dossier personnel fictif, au chemin stable pour des captures identiques
 FAKE_HOME = Path(tempfile.gettempdir()) / "vichy-screenshots" / "vichyradio"
 
+# Variables lues par os.path.expanduser : HOME sous Linux et macOS,
+# USERPROFILE sous Windows.
+HOME_VARIABLES = ("HOME", "USERPROFILE")
+
 
 def _prepare_environment():
-    real_home = os.environ.get("HOME")
+    real_home = {
+        name: os.environ.get(name)
+        for name in HOME_VARIABLES
+    }
 
     shutil.rmtree(FAKE_HOME, ignore_errors=True)
 
     for name in ("emissions", "podcasts", "recordings/manual"):
         (FAKE_HOME / name).mkdir(parents=True)
 
-    os.environ["HOME"] = str(FAKE_HOME)
+    for name in HOME_VARIABLES:
+        os.environ[name] = str(FAKE_HOME)
+
     os.environ["VICHY_DASHBOARD_MODE"] = "DEV"
     os.environ.pop("VICHY_DASHBOARD_ALLOWED_ROOTS", None)
 
     sys.path.insert(0, str(PROJECT_DIRECTORY))
 
     return real_home
+
+
+def _restore_home(real_home):
+    for name, value in real_home.items():
+        if value is None:
+            os.environ.pop(name, None)
+        else:
+            os.environ[name] = value
 
 
 def _start_server():
@@ -77,9 +94,8 @@ def main():
     server, base_url = _start_server()
 
     # L'application a lu le dossier fictif à l'import : on restaure le
-    # vrai HOME pour que Playwright retrouve ses navigateurs (~/.cache).
-    if real_home is not None:
-        os.environ["HOME"] = real_home
+    # vrai dossier personnel pour que Playwright retrouve ses navigateurs.
+    _restore_home(real_home)
 
     OUTPUT_DIRECTORY.mkdir(parents=True, exist_ok=True)
 
