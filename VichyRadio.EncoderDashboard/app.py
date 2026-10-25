@@ -263,7 +263,10 @@ def recording_stop():
     if result.get("success"):
         return jsonify(result), 200
 
-    if result.get("error") == "no_recording":
+    if result.get("error") in (
+        "no_recording",
+        "already_finalizing"
+    ):
         return jsonify(result), 409
 
     return jsonify(result), 500

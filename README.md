@@ -85,14 +85,17 @@ PipeWire ──► EasyEffects ──► easyeffects_source
 ### Enregistrement
 
 - **Source** : `easyeffects_source`, 48 kHz, stéréo.
-- **Pause / reprise** : chaque reprise ouvre un nouveau segment WAV dans un dossier temporaire. À l'arrêt, les segments sont assemblés puis encodés dans le format choisi.
+- **Pause / reprise** : chaque reprise ouvre un nouveau segment WAV dans un dossier temporaire caché (`.vichyradio-recording-*`), créé dans le dossier de destination. À l'arrêt, les segments sont assemblés puis encodés dans le format choisi, sans bloquer le reste du dashboard.
+- **Coupure de source** : si `easyeffects_source` disparaît (redémarrage d'EasyEffects…), l'enregistrement continue : la capture est relancée chaque seconde jusqu'au retour de la source. L'état affiche « SOURCE PERDUE » et le compteur « Coupures source » s'incrémente.
 - **Formats** :
 
 | Format | Encodage |
 |---|---|
-| `wav` | PCM 24 bits |
+| `wav` | PCM 16 bits (résolution native de la capture `pulse` de FFmpeg) |
 | `flac` | FLAC, compression 5 |
 | `mp3` | LAME 320 kb/s |
+
+Au-delà de 4 Go (environ 6 h en WAV), le fichier passe automatiquement au format RF64.
 
 - **Dossier par défaut** : `~/recordings/manual`.
 - **Nom par défaut** : `enregistrement_JJMMAAAA-HHMMSS`.

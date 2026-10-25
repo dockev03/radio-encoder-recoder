@@ -15,6 +15,15 @@ SOURCE_NAME = "easyeffects_source"
 SAMPLE_RATE = 48000
 CHANNELS = 2
 
+# FFmpeg s'arrête quand la source disparaît (redémarrage d'EasyEffects
+# par le watchdog…) : on relance alors un segment jusqu'à son retour.
+MONITOR_INTERVAL = 1.0
+
+# En dessous, un segment ne contient pas d'audio exploitable. Le
+# démultiplexeur concat s'arrête sans erreur sur un fichier illisible
+# et perdrait tous les segments suivants : on l'écarte.
+MIN_SEGMENT_SIZE = 4096
+
 DEFAULT_DIRECTORY = os.path.expanduser("~/recordings/manual")
 DEFAULT_FORMAT = "wav"
 
@@ -46,6 +55,13 @@ _recorded_seconds = 0.0
 _temp_directory = None
 _segments = []
 _segment_number = 0
+
+_dropouts = 0
+_reconnecting = False
+
+# Identifie la session en cours : un ancien thread de surveillance
+# s'arrête de lui-même si une nouvelle session démarre.
+_session = 0
 
 
 # ---------------------------------------------------------------------------
@@ -137,8 +153,12 @@ def _build_capture_command(segment_path):
         "-ar",
         str(SAMPLE_RATE),
 
+        # L'entrée pulse capture en 16 bits : inutile d'écrire plus.
         "-c:a",
-        "pcm_s24le",
+        "pcm_s16le",
+
+        "-rf64",
+        "auto",
 
         "-y",
 
@@ -235,6 +255,82 @@ def _stop_segment():
 
 
 # ---------------------------------------------------------------------------
+# Surveillance de la capture
+# ---------------------------------------------------------------------------
+
+def _detect_capture_loss():
+    global _process
+    global _segment_started_at
+    global _recorded_seconds
+    global _dropouts
+    global _reconnecting
+
+    if (
+        _status != "recording"
+        or
+        _process is None
+        or
+        _process.poll() is None
+    ):
+        return
+
+    # Conserve la durée déjà capturée avant la coupure.
+    if _segment_started_at is not None:
+        _recorded_seconds += max(
+            0,
+            time.monotonic()
+            - _segment_started_at
+        )
+
+    _process = None
+    _segment_started_at = None
+
+    _dropouts += 1
+    _reconnecting = True
+
+
+def _monitor_capture(session):
+    global _reconnecting
+
+    while True:
+        time.sleep(MONITOR_INTERVAL)
+
+        with _lock:
+
+            if (
+                session != _session
+                or
+                _status not in ("recording", "paused")
+            ):
+                return
+
+            _detect_capture_loss()
+
+            if (
+                _status != "recording"
+                or
+                _process is not None
+            ):
+                continue
+
+            try:
+                _start_segment()
+                _reconnecting = False
+
+            except Exception:
+                # Source toujours absente : nouvel essai au tour suivant.
+                pass
+
+
+def _start_monitor():
+    threading.Thread(
+        target=_monitor_capture,
+        args=(_session,),
+        daemon=True
+    ).start()
+
+
+# ---------------------------------------------------------------------------
 # Assemblage final
 # ---------------------------------------------------------------------------
 
@@ -251,6 +347,13 @@ def _create_concat_file():
     ) as file:
 
         for segment in _segments:
+
+            try:
+                if os.path.getsize(segment) < MIN_SEGMENT_SIZE:
+                    continue
+
+            except OSError:
+                continue
 
             # Les segments sont générés par nous-mêmes.
             escaped = segment.replace(
@@ -293,7 +396,10 @@ def _build_final_command(
 
         command.extend([
             "-c:a",
-            "pcm_s24le",
+            "pcm_s16le",
+
+            "-rf64",
+            "auto",
 
             "-ar",
             str(SAMPLE_RATE),
@@ -413,6 +519,8 @@ def _reset_state():
     global _temp_directory
     global _segments
     global _segment_number
+    global _dropouts
+    global _reconnecting
 
     _process = None
     _status = "stopped"
@@ -428,6 +536,9 @@ def _reset_state():
 
     _segments = []
     _segment_number = 0
+
+    _dropouts = 0
+    _reconnecting = False
 
 
 # ---------------------------------------------------------------------------
@@ -448,6 +559,7 @@ def start_recording(
     global _temp_directory
     global _segments
     global _segment_number
+    global _session
 
     with _lock:
 
@@ -518,8 +630,11 @@ def start_recording(
         _segments = []
         _segment_number = 0
 
+        # Même disque que le fichier final : pas de /tmp en RAM
+        # (tmpfs) et l'espace libre affiché est le bon.
         _temp_directory = tempfile.mkdtemp(
-            prefix="vichyradio-recording-"
+            prefix=".vichyradio-recording-",
+            dir=os.path.dirname(_current_file)
         )
 
         try:
@@ -537,6 +652,9 @@ def start_recording(
 
         _status = "recording"
 
+        _session += 1
+        _start_monitor()
+
         return {
             "success": True,
             "status": _status,
@@ -547,6 +665,7 @@ def start_recording(
 
 def pause_recording():
     global _status
+    global _reconnecting
 
     with _lock:
 
@@ -566,6 +685,7 @@ def pause_recording():
             _stop_segment()
 
             _status = "paused"
+            _reconnecting = False
 
             return {
                 "success": True,
@@ -628,6 +748,12 @@ def stop_recording():
                 "error": "no_recording"
             }
 
+        if _status == "finalizing":
+            return {
+                "success": False,
+                "error": "already_finalizing"
+            }
+
         output_file = _current_file
 
         try:
@@ -635,24 +761,38 @@ def stop_recording():
             if _status == "recording":
                 _stop_segment()
 
-            _status = "finalizing"
-
-            _finalize_recording()
-
         except Exception as exception:
-
-            # IMPORTANT :
-            # on ne supprime PAS les segments temporaires
-            # en cas d'échec de finalisation.
-            temp_directory = _temp_directory
-
             _status = "error"
 
             return {
                 "success": False,
                 "error": str(exception),
-                "temporary_directory": temp_directory
+                "temporary_directory": _temp_directory
             }
+
+        # L'état "finalizing" bloque start/pause/resume/stop :
+        # l'assemblage peut tourner sans le verrou, ce qui
+        # laisse l'API d'état répondre pendant l'encodage.
+        _status = "finalizing"
+
+    try:
+        _finalize_recording()
+
+    except Exception as exception:
+
+        # IMPORTANT :
+        # on ne supprime PAS les segments temporaires
+        # en cas d'échec de finalisation.
+        with _lock:
+            _status = "error"
+
+            return {
+                "success": False,
+                "error": str(exception),
+                "temporary_directory": _temp_directory
+            }
+
+    with _lock:
 
         final_size = 0
 
@@ -728,33 +868,11 @@ def _get_disk_free_space():
         return None
 
 def get_recording_status():
-    global _process
-    global _status
-    global _segment_started_at
-    global _recorded_seconds
 
     with _lock:
 
-        # Détection d'un FFmpeg mort anormalement
-
-        if (
-            _status == "recording"
-            and
-            _process is not None
-            and
-            _process.poll() is not None
-        ):
-            # Conserve la durée déjà capturée avant la panne.
-            if _segment_started_at is not None:
-                _recorded_seconds += max(
-                    0,
-                    time.monotonic()
-                    - _segment_started_at
-                )
-
-            _process = None
-            _segment_started_at = None
-            _status = "error"
+        # La relance est faite par le thread de surveillance.
+        _detect_capture_loss()
 
 
         # ----------------------------------------------------
@@ -825,6 +943,10 @@ def get_recording_status():
             "segment_count": len(
                 _segments
             ),
+
+            "reconnecting": _reconnecting,
+
+            "dropouts": _dropouts,
 
             "total_size": total_size,
 

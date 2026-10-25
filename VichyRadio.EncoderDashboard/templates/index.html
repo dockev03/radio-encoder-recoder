@@ -615,15 +615,13 @@
             >
 
                 <strong>
-                    ENREGISTREMENT INTERROMPU
+                    FINALISATION IMPOSSIBLE
                 </strong>
 
                 <span>
-                    La source audio ou le processus
-                    d'enregistrement a été perdu.
+                    Le fichier final n'a pas pu être créé.
                     Les données déjà enregistrées sont conservées.
-                    Appuyez sur STOP pour tenter de finaliser
-                    le fichier.
+                    Appuyez sur STOP pour réessayer.
                 </span>
 
             </div>
@@ -668,7 +666,7 @@
                     <select id="recording-format">
 
                         <option value="wav">
-                            WAV 24 bits
+                            WAV 16 bits
                         </option>
 
                         <option value="flac">
@@ -736,10 +734,10 @@
             <div class="card recording-info-card">
 
                 <span>
-                    SEGMENTS
+                    COUPURES SOURCE
                 </span>
 
-                <strong id="recording-segments">
+                <strong id="recording-dropouts">
                     0
                 </strong>
 
