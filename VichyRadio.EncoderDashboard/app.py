@@ -35,6 +35,25 @@ app = Flask(__name__)
 
 
 # ---------------------------------------------------------------------------
+# Protection CSRF
+#
+# Un site tiers ouvert dans le navigateur d'un poste de la régie peut
+# envoyer un POST vers le dashboard (formulaire, fetch "no-cors"…), mais
+# jamais avec un Content-Type JSON sans requête CORS préalable, que Flask
+# refuse par défaut. Exiger du JSON suffit donc à bloquer ces requêtes.
+# ---------------------------------------------------------------------------
+
+@app.before_request
+def require_json_post():
+
+    if request.method == "POST" and not request.is_json:
+        return jsonify({
+            "success": False,
+            "error": "json_required"
+        }), 415
+
+
+# ---------------------------------------------------------------------------
 # Dashboard
 # ---------------------------------------------------------------------------
 
