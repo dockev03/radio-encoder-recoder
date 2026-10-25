@@ -107,6 +107,8 @@ Au-delà de 4 Go (environ 6 h en WAV), le fichier passe automatiquement au forma
 
 ### Machine encodeur (mode PROD)
 
+> 📘 Procédure complète de préparation du poste : [docs/installation-pc-encodeur.md](docs/installation-pc-encodeur.md).
+
 - Linux avec **PipeWire** (`pw-cat`, `pactl` via `pipewire-pulse`)
 - **EasyEffects**, exposant la source `easyeffects_source`
 - **FFmpeg** avec l'entrée `pulse` et l'encodeur `libmp3lame`
