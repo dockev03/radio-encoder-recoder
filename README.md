@@ -294,6 +294,7 @@ La CI GitHub Actions (`.github/workflows/ci.yml`) s'exécute sur chaque PR et ch
 |---|---|
 | `lint-test` | `ruff check` + `pytest` (Python 3.13, mode DEV) |
 | `trivy` | Scan du dépôt, échec sur vulnérabilité HIGH/CRITICAL corrigeable |
+| `screenshots` | Sur chaque PR : génère les captures et les joint au run (artefact `captures-pr-N`) |
 
 ---
 
