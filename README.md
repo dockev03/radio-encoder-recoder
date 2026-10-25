@@ -120,7 +120,7 @@ sudo apt install python3 python3-venv ffmpeg pipewire-pulse easyeffects usbutils
 
 ### Poste de développement (mode DEV)
 
-Seul **Python 3.13** est nécessaire. En mode DEV, l'audio, le flux et le titre en cours sont simulés.
+Seul **Python 3.13** est nécessaire. En mode DEV, l'audio (niveaux et forme d'onde), le flux et le titre en cours sont simulés.
 
 ---
 

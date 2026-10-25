@@ -2,7 +2,10 @@ from flask import Flask, render_template, jsonify, request
 
 from config import MODE, HOST, PORT, DEBUG
 
-from services.audio import get_audio_status
+from services.audio import (
+    get_audio_status,
+    get_dev_waveform
+)
 from services.audio_meter import (
     get_audio_levels,
     get_waveform
@@ -19,6 +22,7 @@ from services.watchdog import (
     get_watchdog_status
 )
 from services.recording import (
+    DEFAULT_DIRECTORY,
     get_recording_status,
     start_recording,
     pause_recording,
@@ -59,7 +63,10 @@ def require_json_post():
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template(
+        "index.html",
+        default_recording_directory=DEFAULT_DIRECTORY
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -85,6 +92,11 @@ def audio():
 
 @app.route("/api/audio/waveform")
 def audio_waveform():
+
+    if MODE == "DEV":
+        return jsonify(
+            get_dev_waveform()
+        )
 
     return jsonify(
         get_waveform()
