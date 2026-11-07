@@ -307,7 +307,7 @@ La CI GitHub Actions (`.github/workflows/ci.yml`) s'exécute sur chaque PR et ch
 
 ## Contribution
 
-Les règles complètes sont dans [`AGENTS.md`](AGENTS.md). En résumé :
+Les règles complètes sont dans [`AGENTS.md`](AGENTS.md) et [`docs/ai/proposition.md`](docs/ai/proposition.md). En résumé :
 
 - **Pas de commit direct** sur `main`, `master` ou `staging`.
 - **Une branche par évolution** : `feature/etape-N-sujet`, `feature/sujet`, `fix/sujet` ou `docs/sujet`.
